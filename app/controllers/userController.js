@@ -1,6 +1,5 @@
 var User = require('../models/user');
 var Token = require('../models/token');
-var errorCodes = require('../../errorCodes');
 
 module.exports = function(router, isTokenValid) {
 	router.post('/signup', function(req, res) {
@@ -13,8 +12,7 @@ module.exports = function(router, isTokenValid) {
 			if(err) {
 				console.log(err);
 				return res.json({
-					success: false,
-					errorCode: errorCodes._userSignUpFailed
+					success: false
 				});
 			}
 
@@ -28,17 +26,22 @@ module.exports = function(router, isTokenValid) {
 		User.findOne({ username: req.query.username }, function(err, user) {
 			if(err || !user) {
 				return res.json({
-					success: false,
-					errorCode: errorCodes._invalidUsername
+					success: false
 				});
+			}
+
+			// Verify password (for security)
+			if(!user.isPasswordValid(req.query.password)) {
+				return res.json({
+					success: false
+				})
 			}
 
 			Token.findOne({ user_id: user.id }, function(err, token) {
 				if(err) {
 					console.log(err);
 					return res.json({ 
-						success: false,
-						errorCode: errorCodes._userAuthentificationFailed
+						success: false
 					});
 				}
 
@@ -62,8 +65,7 @@ module.exports = function(router, isTokenValid) {
 						if(err) {
 							console.log(err);
 							return res.json({ 
-								success: false,
-								errorCode: errorCodes._userAuthentificationFailed
+								success: false
 							});
 						}
 					});
@@ -78,43 +80,13 @@ module.exports = function(router, isTokenValid) {
 		});
 	});
 
-	router.put('/user/edit/', isTokenValid, function(req, res) {
-		var userAuth = req.user;
-
-		// Verify password (for security)
-		if(!userAuth.isPasswordValid(req.query.password)) {
-			return res.json({
-				success: false,
-				errorCode: errorCodes._invalidPassword
-			})
-		}
-
-		// update here
-		userAuth.password = req.body.password;
-
-		userAuth.save(function(saveErr) {
-			if(saveErr) {
-				console.log(saveErr);
-				return res.json({
-					success: false,
-					errorCode: errorCodes._userAuthentificationFailed
-				});
-			}
-
-			res.json({
-				success: true
-			});
-		});
-	});
-
 	router.delete('/logout', isTokenValid, function(req, res) {
 		var accessToken = req.headers['x-access-token'];
 
 		Token.findOne({ value: accessToken }, function(err, token) {
 			if(err || !token) {
 				res.json({
-					success: false,
-					errorCode: errorCodes._invalidAccessToken
+					success: false
 				});
 				return next('Token not found');
 			}
@@ -122,8 +94,7 @@ module.exports = function(router, isTokenValid) {
 			token.remove(function(remErr) {
 				if(remErr) {
 					return res.json({
-						success: false,
-						errorCode: errorCodes._logoutFailed
+						success: false
 					});
 				}
 

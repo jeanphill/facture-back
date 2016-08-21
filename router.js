@@ -1,7 +1,6 @@
 var fs = require('fs');
 var Token = require('./app/models/token');
 var User = require('./app/models/user');
-var errorCodes = require('./errorCodes');
 
 module.exports = function(router) {
 
@@ -11,8 +10,7 @@ module.exports = function(router) {
 		Token.findOne({ value: accessToken }, function(err, token) {
 			if(err || !token) {
 				res.json({
-					success: false,
-					errorCode: errorCodes._invalidAccessToken
+					success: false
 				});
 				return next('Token not found');
 			}
@@ -20,8 +18,7 @@ module.exports = function(router) {
 			User.findById(token.user_id, function(findErr, user) {
 				if(!user) {
 					res.json({
-						success: false,
-						errorCode: errorCodes._userNotFound
+						success: false
 					});
 					return next('User not found');
 				} else {
@@ -36,7 +33,7 @@ module.exports = function(router) {
 	// dynamically includes routes (Controller)
 	fs.readdirSync('./app/controllers').forEach(function (file) {
 		if(file.substr(-3) == '.js') {
-			route = require('./app/controllers/' + file)(router, isTokenValid);
+			require('./app/controllers/' + file)(router, isTokenValid);
 		}
 	});
 

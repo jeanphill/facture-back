@@ -1,4 +1,4 @@
-var mongoose = require('mongoose');
+	var mongoose = require('mongoose');
 var hashMethod = require('crypto-js/sha256');
 var crypto = require('crypto');
 var Token = require('./token');
@@ -9,13 +9,7 @@ var UserSchema = new mongoose.Schema({
 		type: String, 
 		unique: true, 
 		index: true, 
-		required: true,
-		validate: {
-			validator: function(str) {
-				return /^[a-z0-9]{3,}$/i.test(str);
-			},
-			message: 'A valid username should only contains aphanumerical characters!'
-		} 
+		required: true
 	},
 	password: { type: String, required: true },
 	salt: Buffer,
