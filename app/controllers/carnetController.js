@@ -21,7 +21,8 @@ module.exports = function(router, isTokenValid) {
             }
 
             res.json({
-                success: true
+                success: true,
+                carnet: carnet
             });
         });
     });
@@ -50,8 +51,6 @@ module.exports = function(router, isTokenValid) {
                     success: false
                 });
             }
-
-            console.log(carnet);
 
             Facture.find({ _id: { "$in": carnet.factures }}, function(err, factures) {
                 res.json({

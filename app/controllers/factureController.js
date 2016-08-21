@@ -8,7 +8,7 @@ module.exports = function(router, isTokenValid) {
     router.post('/carnet/:id/facture', isTokenValid, function(req, res) {
         var facture = new Facture();
 
-        facture.produits = req.body.produits;
+        facture.produits = [];
 
         facture.save(function(err, newFacture) {
             if(err) {
@@ -39,7 +39,8 @@ module.exports = function(router, isTokenValid) {
             });
 
             res.json({
-                success: true
+                success: true,
+                facture: facture
             });
         });
     });

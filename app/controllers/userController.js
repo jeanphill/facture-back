@@ -4,7 +4,7 @@ var Token = require('../models/token');
 module.exports = function(router, isTokenValid) {
 	router.post('/signup', function(req, res) {
 		var user = new User();
-		
+
 		user.username = req.body.username;
 		user.password = req.body.password;
 
@@ -16,7 +16,7 @@ module.exports = function(router, isTokenValid) {
 				});
 			}
 
-			res.json({ 
+			res.json({
 				success: true
 			});
 		});
@@ -40,7 +40,7 @@ module.exports = function(router, isTokenValid) {
 			Token.findOne({ user_id: user.id }, function(err, token) {
 				if(err) {
 					console.log(err);
-					return res.json({ 
+					return res.json({
 						success: false
 					});
 				}
@@ -64,19 +64,26 @@ module.exports = function(router, isTokenValid) {
 					token.save(function(err) {
 						if(err) {
 							console.log(err);
-							return res.json({ 
+							return res.json({
 								success: false
 							});
 						}
 					});
 				}
 
-				res.json({ 
+				res.json({
 					success: true,
 					token: token.value,
 					username: user.username
 				});
 			});
+		});
+	});
+
+	router.get('/token', isTokenValid, function(req, res) {
+		res.json({
+			success: true,
+			auth: true
 		});
 	});
 
